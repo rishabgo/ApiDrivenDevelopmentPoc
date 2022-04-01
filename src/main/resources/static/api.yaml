@@ -1,0 +1,123 @@
+openapi: "3.0.0"
+info:
+  version: 1.0
+  title: Book rest apis!
+servers:
+  - url: http://localhost:8080
+paths:
+  /book:
+    get:
+      summary: Get Books
+      operationId: getBooks
+      tags:
+        - books
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessfulResponse200'
+        '400':
+          $ref: '#/components/responses/ErrorResponse400'
+        '500':
+          $ref: '#/components/responses/ErrorResponse500'
+    post:
+      summary: Create a Book
+      operationId: createBook
+      tags:
+        - books
+      requestBody:
+        description: Details of the book to add
+        required: true
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/BookInfo'
+      responses:
+        '201':
+          $ref: '#/components/responses/SuccessfulResponse201'
+        '400':
+          $ref: '#/components/responses/ErrorResponse400'
+        '500':
+          $ref: '#/components/responses/ErrorResponse500'
+  /book/{bookId}:
+    get:
+      summary: Get book by Id
+      operationId: getBook
+      tags:
+        - books
+      parameters:
+        - name: bookId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 'Successful Response 200'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookInfo'
+        '400':
+          $ref: '#/components/responses/ErrorResponse400'
+        '500':
+          $ref: '#/components/responses/ErrorResponse500'
+components:
+  schemas:
+    BookResponse:
+      title: BookResponse
+      type: object
+      properties:
+        bookResponse:
+          type: array
+          items:
+            $ref: '#/components/schemas/BookInfo'
+    BookInfo:
+      title: BookInfo
+      type: object
+      properties:
+        bookId:
+          type: integer
+          format: int32
+        bookName:
+          type: string
+        publisher:
+          type: string
+        authors:
+          type: array
+          items:
+            type: string
+    ErrorResponse:
+      title: ErrorResponse
+      type: object
+      properties:
+        message:
+          type: string
+        type:
+          type: string
+        time:
+          type: string
+          format: date-time
+  responses:
+    SuccessfulResponse200:
+      description: Successful operation 200
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/BookResponse'
+    SuccessfulResponse201:
+      description: Successful operation 201
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/BookInfo'
+    ErrorResponse400:
+      description: Error Response for http status 400
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    ErrorResponse500:
+      description: Error Response for http status 500
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'

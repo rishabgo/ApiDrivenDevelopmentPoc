@@ -1,0 +1,52 @@
+plugins {
+	id 'org.springframework.boot' version '2.6.5'
+	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+	id 'org.openapi.generator' version "4.3.1"
+	id 'java'
+}
+
+group = 'com.rishabh'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+	implementation "io.swagger.parser.v3:swagger-parser:2.0.20"
+	implementation "org.openapitools:jackson-databind-nullable:0.2.1"
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+// generates the spring controller interfaces from openapi spec in src/main/resources/service.yaml
+openApiGenerate {
+	generatorName = "spring"
+	inputSpec = "$projectDir/src/main/resources/static/api.yaml"
+	outputDir = "$buildDir/generated"
+	apiPackage = "org.books.bookservice.api"
+	invokerPackage = "org.books.bookservice"
+	modelPackage = "org.books.models"
+	configOptions = [
+			dateLibrary: "java8",
+			interfaceOnly: "true",
+	]
+}
+
+// forces generation of spring controllers on compile, adding them to the sources for compilation
+compileJava.dependsOn tasks.openApiGenerate
+sourceSets.main.java.srcDir "$buildDir/generated/src/main/java"
+sourceSets.main.resources.srcDir "$buildDir/generated/src/main/resources"
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
